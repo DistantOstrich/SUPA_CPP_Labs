@@ -1,3 +1,8 @@
+/*
+Duncan Robb - 24th November 2023
+Utility functions for SUPA C++ excercises
+*/
+
 #pragma once
 
 #include "sstream"
@@ -5,6 +10,7 @@
 #include "fstream"
 #include "iostream"
 
+// Split a string into a vector of strings using the given delimeter character
 std::vector<std::string> splitToString(const std::string& s, char delim) {
 
 	std::stringstream ss(s);
@@ -18,6 +24,7 @@ std::vector<std::string> splitToString(const std::string& s, char delim) {
 	return elems;
 }
 
+// Split a string into a vector of floats using the given delimeter character
 std::vector<float> splitToFloat(const std::string& s, char delim) {
 
 	std::stringstream ss(s);
@@ -32,6 +39,7 @@ std::vector<float> splitToFloat(const std::string& s, char delim) {
 	return elems;
 }
 
+// Split a string into a vector of ints using the given delimeter character
 std::vector<int> splitToInt(const std::string& s, char delim) {
 
 	std::stringstream ss(s);
@@ -46,6 +54,7 @@ std::vector<int> splitToInt(const std::string& s, char delim) {
 	return elems;
 }
 
+// Offer a numbered list of options in the terminal, and return the chosen number
 int coutToInt(std::initializer_list<std::string> options, int startIndex) {
 
 	for (std::string o : options) {
@@ -57,6 +66,7 @@ int coutToInt(std::initializer_list<std::string> options, int startIndex) {
 	return result;
 }
 
+// Offer a numbered list of options in the terminal, and return the chosen number
 int coutToInt(std::vector<std::string> options, int startIndex) {
 
 	for (std::string o : options) {
@@ -68,10 +78,12 @@ int coutToInt(std::vector<std::string> options, int startIndex) {
 	return result;
 }
 
+// Check if a test string contains a substring
 bool contains(std::string testString, std::string segment) {
 	return testString.find(segment) != std::string::npos;
 }
 
+// Read in a comma-separated text file to a vector of floats
 std::vector<std::vector<float>> readInData(std::string filename) {
 
     std::ifstream ifs(filename);
@@ -82,4 +94,9 @@ std::vector<std::vector<float>> readInData(std::string filename) {
 		pairs.push_back(splitToFloat(line, ','));
 	}
     return pairs;
+}
+
+// Round a float to the nearest integer
+int roundToInt(float f) {
+    return std::roundf(f);
 }
