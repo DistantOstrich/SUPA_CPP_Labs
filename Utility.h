@@ -9,6 +9,7 @@ Utility functions for SUPA C++ excercises
 #include "vector"
 #include "fstream"
 #include "iostream"
+#include "cmath"
 
 // Split a string into a vector of strings using the given delimeter character
 std::vector<std::string> splitToString(const std::string& s, char delim) {
@@ -33,6 +34,21 @@ std::vector<float> splitToFloat(const std::string& s, char delim) {
 	while (std::getline(ss, item, delim)) {
 		if (item.size() > 0) {
 			float d = std::stod(item);
+			elems.push_back(d);
+		}
+	}
+	return elems;
+}
+
+// Split a string into a vector of doubles using the given delimeter character
+std::vector<double> splitToDouble(const std::string& s, char delim) {
+
+	std::stringstream ss(s);
+	std::string item;
+	std::vector<double> elems;
+	while (std::getline(ss, item, delim)) {
+		if (item.size() > 0) {
+			double d = std::stod(item);
 			elems.push_back(d);
 		}
 	}
@@ -96,7 +112,20 @@ std::vector<std::vector<float>> readInData(std::string filename) {
     return pairs;
 }
 
+// Read in a text file of one value per line to a vector of floats
+std::vector<double> readInDataSingles(std::string filename) {
+
+    std::ifstream ifs(filename);
+    std::string line;
+	std::vector<double> points = std::vector<double>();
+	while (std::getline(ifs, line)) {
+		if (line == "") { continue; }
+		else { points.push_back(std::stod(line)); }
+	}
+    return points;
+}
+
 // Round a float to the nearest integer
 int roundToInt(float f) {
-    return std::roundf(f);
+    return std::round(f);
 }

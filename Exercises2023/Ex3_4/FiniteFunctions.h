@@ -1,8 +1,9 @@
+#pragma once //Replacement for IFNDEF
+
 #include <string>
 #include <vector>
-#include "gnuplot-iostream.h"
-
-#pragma once //Replacement for IFNDEF
+#include <numbers>
+#include "../../GNUplot/gnuplot-iostream.h"
 
 class FiniteFunction{
 
@@ -18,6 +19,7 @@ public:
   void setRangeMax(double RMax);
   void setOutfile(std::string outfile);
   void plotFunction(); //Plot the function using scanFunction
+  void plotFunction(int nSteps);
   
   //Plot the supplied data points (either provided data or points sampled from function) as a histogram using NBins
   void plotData(std::vector<double> &points, int NBins, bool isdata=true); //NB! use isdata flag to pick between data and sampled distributions
@@ -46,4 +48,85 @@ protected:
   
 private:
   double invxsquared(double x); //The default functional form
+};
+
+
+// Daughter class for normal distribution, inheriting from FiniteFunction
+class Gaussian : public FiniteFunction {
+
+public:
+  Gaussian();
+  Gaussian(double mean, double sigma, double rangeMin, double rangeMax, std::string outfile);
+  ~Gaussian();
+  void setMean(double mean);
+  void setSigma(double sigma);
+  double mean();
+  double sigma();
+  double callFunction(double x);
+  void printInfo();
+
+protected:
+  double m_mean;
+  double m_sigma;
+
+private:
+  double gaussian(double x);
+};
+
+
+// Daughter class for Cauchy-Lorentz distribution, inheriting from FiniteFunction
+class CauchyLorentz : public FiniteFunction {
+
+public:
+  CauchyLorentz();
+  CauchyLorentz(double x0, double gamma, double rangeMin, double rangeMax, std::string outfile);
+  ~CauchyLorentz();
+  void setX0(double x0);
+  void setGamma(double gamma);
+  double x0();
+  double gamma();
+  double callFunction(double x);
+  void printInfo();
+
+protected:
+  double m_x0;
+  double m_gamma;
+
+private:
+  double cauchyLorentz(double x);
+};
+
+
+// Daughter class for negative Crystal Ball distribution, inheriting from FiniteFunction
+class CrystalBall : public FiniteFunction {
+
+public:
+  CrystalBall();
+  CrystalBall(double mean, double n, double alpha, double sigma, double rangeMin, double rangeMax, std::string outfile);
+  ~CrystalBall();
+  void setMean(double mean);
+  void setN(double n);
+  void setAlpha(double alpha);
+  void setSigma(double sigma);
+  double mean();
+  double n();
+  double alpha();
+  double sigma();
+  double callFunction(double x);
+  void printInfo();
+
+protected:
+  double m_mean;
+  double m_n;
+  double m_alpha;
+  double m_sigma;
+  double m_magAlpha;
+  double m_A;
+  double m_B;
+  double m_C;
+  double m_D;
+  double m_N;
+
+private:
+  double crystalBall(double x);
 };
