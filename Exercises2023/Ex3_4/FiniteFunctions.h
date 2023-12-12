@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <numbers>
+#include <random>
 #include "../../GNUplot/gnuplot-iostream.h"
 
 class FiniteFunction{
@@ -20,6 +21,7 @@ public:
   void setOutfile(std::string outfile);
   void plotFunction(); //Plot the function using scanFunction
   void plotFunction(int nSteps);
+  std::vector<double> sampleFunctionMetropolis(int nSamples = 10000, double sigma = 1.0); // Generate sample data from the distribution using the Metropolis algorithm
   
   //Plot the supplied data points (either provided data or points sampled from function) as a histogram using NBins
   void plotData(std::vector<double> &points, int NBins, bool isdata=true); //NB! use isdata flag to pick between data and sampled distributions
@@ -44,7 +46,8 @@ protected:
   double integrate(int Ndiv);
   std::vector< std::pair<double, double> > makeHist(std::vector<double> &points, int Nbins); //Helper function to turn data points into histogram with Nbins
   void checkPath(std::string outstring); //Helper function to ensure data and png paths are correct
-  void generatePlot(Gnuplot &gp); 
+  void generatePlot(Gnuplot &gp);
+  double generateNextValueMetropolis(double xPrev, double sigma, std::uniform_real_distribution<double> zeroToOne, std::mt19937* rng, bool* success); // Generate the next value in the Metropolis algorithm
   
 private:
   double invxsquared(double x); //The default functional form

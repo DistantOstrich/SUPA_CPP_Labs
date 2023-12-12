@@ -90,7 +90,7 @@ void findGaussianParams(std::vector<double> data) {
         testCauchyLorentz(data, params[0], params[1]);
 
         // Ask if this looks good or they want to try again with different params
-        std::cout << "If these params look good, enter 0" << std::endl;
+        std::cout << "If these params look good, or to try a different distribution, enter 0" << std::endl;
         std::cout << "Otherwise enter new parameter values to try, with the format as before:" << std::endl;
         std::cout << "mean,sigma" << std::endl;
         std::cin >> inVals;
@@ -119,7 +119,7 @@ void findCauchyLorentzParams(std::vector<double> data) {
         testCauchyLorentz(data, params[0], params[1]);
 
         // Ask if this looks good or they want to try again with different params
-        std::cout << "If these params look good, enter 0" << std::endl;
+        std::cout << "If these params look good, or to try a different distribution, enter 0" << std::endl;
         std::cout << "Otherwise enter new parameter values to try, with the format as before:" << std::endl;
         std::cout << "mean,gamma" << std::endl;
         std::cin >> inVals;
@@ -148,7 +148,7 @@ void findCrystalBallParams(std::vector<double> data) {
         testCrystalBall(data, params[0], params[1], params[2], params[3]);
 
         // Ask if this looks good or they want to try again with different params
-        std::cout << "If these params look good, enter 0" << std::endl;
+        std::cout << "If these params look good, or to try a different distribution, enter 0" << std::endl;
         std::cout << "Otherwise enter new parameter values to try, with the format as before:" << std::endl;
         std::cout << "mean,n,alpha,sigma" << std::endl;
         std::cin >> inVals;
@@ -159,14 +159,7 @@ void findCrystalBallParams(std::vector<double> data) {
     }
 }
 
-int main() {
-
-    // Read in the data file
-    std::string dataFile = "Outputs/data/MysteryData11141.txt";
-    std::vector<double> data = readInDataSingles(dataFile);
-
-    // Test each of the functions
-    //testAllFunctions(data);
+void findParameters(std::vector<double> data) {
 
     // Try to find the distribution parameters (It is a Cauchy-Lorentz, mean=-2.0, gamma=0.75)
     bool another = true;
@@ -187,4 +180,38 @@ int main() {
         }
         another = coutToInt({"Done", "Try another distribution"}, 0);
     }
+}
+
+// Generate and plot a sample of the Cauchy-Lorentz distribution
+void sampleAndPlotCauchyLorentz(std::vector<double> data, double sigma, double xMin, double xMax, double mean, double gamma) {
+
+    // Create the Cauchy-Lorentz class object
+    CauchyLorentz cl = CauchyLorentz(mean, gamma, xMin, xMax, "DistributionSample");
+
+    // Generate the sample distribution with the default 10000 samples
+    std::vector<double> sample = cl.sampleFunctionMetropolis(10000, sigma);
+
+    // Plot the data and distribution
+    cl.plotFunction();
+    cl.plotData(sample, 1000, false);
+    cl.plotData(data, 1000);
+
+    std::cout << "Done!" << std::endl;
+}
+
+int main() {
+
+    // Read in the data file
+    std::string dataFile = "Outputs/data/MysteryData11141.txt";
+    std::vector<double> data = readInDataSingles(dataFile);
+
+    // Test each of the functions
+    //testAllFunctions(data);
+
+    // Find the parameters of the distribution.
+    // It's a Cauchy-Lorentz with mean=-2 and gamma=0.75
+    //findParameters(data);
+
+    // Sample the distribution and plot the results, with adjustable sigma for the gaussian distribution
+    sampleAndPlotCauchyLorentz(data, 0.5);
 }

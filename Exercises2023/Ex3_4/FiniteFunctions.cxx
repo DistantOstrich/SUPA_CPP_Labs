@@ -270,6 +270,88 @@ void FiniteFunction::generatePlot(Gnuplot &gp){
   }
 }
 
+// Get the next value in the Markov chain from the previous
+double FiniteFunction::generateNextValueMetropolis(double xPrev, double sigma, std::uniform_real_distribution<double> zeroToOne, std::mt19937* rng, bool* success) {
+
+  // Create a normal distribution centred on xPrev, with arbitrarily chosen sigma
+  std::normal_distribution<double> normal = std::normal_distribution<double>(xPrev, sigma);
+
+  // We will keep trying values of y until one is accepted as the next link in the chain. We will keep track of 
+  // the number of attempts, and break the loop if it starts getting ridiculous
+  bool acceptY = false;
+  int attempts = 0;
+  while (!acceptY) {
+
+    // Get a random number from this normal distribution
+    double y = normal(*rng);
+
+    // Calculate f(y), f(xPrev), and f(y)/f(xPrev)
+    double fOfY = callFunction(y);
+    double fOfXPrev = callFunction(xPrev);
+    double fYOverfX = fOfY / fOfXPrev;
+
+    // Calculate A
+    double A = std::min(fYOverfX, 1.0);
+
+    // Get a random number between zero and one (call it T) and check if it is less than A
+    double T = zeroToOne(*rng);
+    acceptY = T < A;
+  
+    // If this value is accepted, return it. Otherwise try again with a new y
+    if (acceptY) {
+      return y;
+    }
+    else {
+      attempts++;
+      // If the number of attempts gets too large without finding an acceptable next step, then there is
+      // probably an error somewhere, so return a dummy value and break the loop
+      if (attempts > 1000) {
+        *success = false;
+        return -1e6;
+      }
+    }
+  }
+}
+
+// Generate a sample of values from the distribution
+std::vector<double> FiniteFunction::sampleFunctionMetropolis(int nSamples, double sigma) {
+
+  // The collection of points sampled from the distribution, to be filled and returned
+  std::vector<double> sample = std::vector<double>();
+
+  // Set up a uniform distribution over the function range, another from 0 to 1, and a random number generator
+  std::uniform_real_distribution<double> uniform = std::uniform_real_distribution<double>(m_RMin, m_RMax);
+  std::uniform_real_distribution<double> zeroToOne = std::uniform_real_distribution<double>(0.0, 1.0);
+  std::mt19937 rng; 
+  rng.seed(std::random_device{}());
+
+  // Get the first value in the chain and add it to the sample
+  double x = uniform(rng);
+  sample.push_back(x);
+
+  // Generate the rest of the samples
+  for (int i = 1; i < nSamples; i++) {
+
+    // Get the next value
+    bool success = true;
+    double xNext = generateNextValueMetropolis(x, sigma, zeroToOne, &rng, &success);
+
+    // Check if the algorithm successfully found a value. If not, just return what we have with an error message.
+    // If it did find a value then add it to the sample and continue
+    if (!success) {
+      std::cout << "Failed to find an acceptable value after " << i << " iterations" << std::endl;
+      break;
+    }
+    else {
+      sample.push_back(x);
+
+      // Use this value to generate the next value
+      x = xNext;
+    }
+  }
+  return sample;
+}
+
 // -------------------------------------------Gaussian---------------------------------------------------
 
 // Empty constructor
